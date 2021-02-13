@@ -56,18 +56,6 @@ Meaning
 8. `      image: domambia/simple-backend:0.0.2` -> The exact tag applied to our image.
 
 
-### Common Commands
-
-| Docker World  |  K8s World |   |
-|---|---|---|---|---|
-|docker ps   | kubectl get pods  |   |
-|docker exec -it [container_id] [cmd]  | kubectl exec -it [pod_name] [cmd]   |   |
-|docker logs [container_id]   | kubectl logs [pod_name]  |   |
-|   |kubectl delete [pod_name]   |   |
-|   |kubectl apply -f [config_file_name]   |   |
-|   |kubectl describe pod [pod_name]   |   |
-|   |kubectl describe service/deplolyment/node/pod [name]  |  |
-
 
 ### Common Commands for `Pod(s)`
 
