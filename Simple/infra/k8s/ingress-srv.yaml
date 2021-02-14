@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations: #important to tell ingress controller has rules
+    kubernetes.io/ingress.class: nginx
+    # ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regrex: "true"
+spec:
+  rules:
+    - host: posts.com
+      http:
+        paths:
+          - path: /posts
+            backend:
+              serviceName: posts-srv
+              servicePort: 4000

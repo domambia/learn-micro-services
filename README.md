@@ -101,3 +101,163 @@ $ kubectl describe deployment  [depl_name]
 $ kubectl apply -f  [config_name_file_yaml]
 $ kubectl delete deployment [depl_name]
 ```
+
+### Updating Deployment(s)
+
+There are two different ways 
+1. `Method 1` - Don`t use this method in a production ready application
+   
+	-  Make a chance to your project code 
+	-  Rebuild your image by specifying new image version 
+	-  In your deployment config file (YAML), update the version of your image
+	-  Run command to recreate your deployment `kubectl apply -f [config_file]`
+
+
+
+2. `Method 2` - Tell kubernetes to use the latest version of the images. To either pull the image automatically or not. The deployment must use the `latest` tag in your pod spec section
+	> `This method is the preferred one`
+Steps:
+	- Make change to your code.
+	- Build your image
+	- Push your image to docker hub
+	- Add the `:latest` tag tp your pod section inside your deployment
+	- Apply your deployment config file `kubectl rollout restart deployment <depl_name>`
+
+
+## Services
+
+Kubernetes gives  Pods their own IP address and DNS name and load balance a cross them. Since a pod's is not static and cannot be accessible from outside the kubernetes. Services provides a way that gives human readable URl and its is static.
+
+K8s Service is like a REST Object similar to a Pod. Like all the REST Objects, You can `POST` Service defination via Config Files and create a new Services
+
+N/B The name of a service must be valid `RULE of DNS Name`
+	- contain at most 63 characters
+	- contain only lowercase alphanumeric characters or '-'
+	- start with an alphanumeric character
+	- end with an alphanumeric character
+
+K8s Service is found in `v1` Object
+
+Simply:
+- a Service provides networking between pods or anytime we want to access our pod to the outside world.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-srv
+spec:
+  type: NodePort
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000 # port unto which we are sending top SRV
+      targetPort: 4000 # actual port our application is listening on
+```
+
+
+### Types of Services
+
+1. Cluster IP
+
+- Sets up an easy to remember URL to access a pod. It only exposes pods inside the cluster. Not accessible from the outside world.
+
+MOST USED 
+
+
+1. Node Port 
+   - Makes a pod accessible from outside the cluser. Usually only used for development purposes.
+  
+2. Load Balancers
+   - Makes a pod accessible from the outside a cluster. `This is the right way to exposes a pod to the outside world`
+
+MOST USED
+
+3. External Name
+   - Redirects an in-cluster requests to a CNAME url. More advanced
+
+
+
+#### Node Port Service
+
+- Example of YAML FiLE
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-srv
+spec:
+  type: NodePort
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000 # port unto which we are sending top SRV
+      targetPort: 4000 # actual port our application is listening on
+```
+
+
+N/B:  To access the site via `NodePort/ Load Balances`  Service depends if you are using `Docker for Mac/Windows ->  http://localhost:3xxxx/posts` and for `Docker Toolbox with Minikube -> <som_ip>:3xxxx/posts`. To get `<some_ip>:  Run $ minikube ip`
+
+#### Cluster IP Services
+- Allows communication between Pods within a cluster
+
+
+
+
+
+
+## Procedures to Use
+1. Build and Images of <app e.g event-bus>
+2. Push the image to docker hub
+3. Create a deployment for <Event-Bus>
+4. Create Cluster  IP Services for <Event-Bus-and-posts>
+5. Apply the change to kubernetes
+
+
+### LOAD BALANCERS
+The right way to exposes  the service to outside the cluster.
+
+> `Load Balance` - >Tells kubernetes to reach out to its provider and provision a load balancer. Gets traffic to a single pod.
+> `Ingress or Ingress Controller` -> a pod with a set of routing rules to distribute  traffic to other services.
+
+
+## Full Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-bus-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-bus #linking with pod
+  template:
+    metadata:
+      labels:
+        app: event-bus #linking pod with selector
+    spec:
+      containers:
+        - name: event-bus # container name
+          image: domambia/simple-event #image from docker hub
+---
+# Service to allow communicatio within  the application
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-bus-srv
+spec:
+  selector:
+    app: event-bus
+  ports:
+    - name: event-bus
+      protocol: TCP
+      port: 4001
+      targetPort: 4001
+```

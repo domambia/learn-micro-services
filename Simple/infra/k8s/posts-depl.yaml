@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: posts-depl
 spec:
-  replicas: 5
+  replicas: 1
   selector: # which pod the deployment to manage
     matchLabels:
       app: posts
@@ -14,4 +14,18 @@ spec:
     spec:
       containers:
         - name: posts
-          image: domambia/simple-backend:0.0.2
+          image: domambia/simple-backend #domambia/simple-backend:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-srv
+spec:
+  selector:
+    app: posts # label
+  # type: ClusterIp # not provides its the default
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
