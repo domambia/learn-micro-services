@@ -255,9 +255,60 @@ metadata:
 spec:
   selector:
     app: event-bus
+
   ports:
     - name: event-bus
       protocol: TCP
       port: 4001
       targetPort: 4001
+```
+
+
+
+## Ingress Nginx Configurations
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - host: ticketing.dev
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            backend:
+              serviceName: auth-srv
+              servicePort: 3000
+```
+
+
+## Skaffold
+
+- Skaffold helps in development and 
+
+
+```yaml
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: domambia/tickening-auth
+      context: auth # folder contain all this files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts" #find all files ending with .ts
+            dest: .
 ```
