@@ -26,9 +26,36 @@
 > Some how similar to stubhub application. Ticketing application
 
 ### Business RULES
+
 1. Users can list tickets for events(concert, sports) for sale.
 2. Other user can purchase this tickets
 3. Any user can list tickets for sale and pucharse tickets
 4. When a user attempts to purchase a ticket, the ticket if locked for `15 minutes`.  The user has 15 minutes to enter their payment information.
-5. While locked, no other user can purchase the ticket. After 15 minutes the ticket should unlock.
+5. While locked, no other user can purchase the ticket. After 15 minutes the ticket should unlock. If locked will no be listed to user
 6. Ticket prices can be edited if they are not locked.
+
+
+### Resource Type
+
+> User[email: string , password: string]
+> Ticket[title: string, price: number, userId: Ref to User, OrderId: Ref to Order, ]
+> Order [userId: Ref to User, status: [created| Cancelled|Awaiting Payment | completed], ticketId: Ref to Ticket, expiresAt: Date]
+> Charge: [orderId: Ref to Order, status: [Created |  Failed |  Completed], amount:  number, stripeId: string,*stripedRefundId: string  ]
+
+
+### Service Types
+
+1. `auth`  -> srv to handle everything related to user signup/signin/signout and etc
+2. `tickects` ->  srv for creation/editing. Knows whether  a ticket can be updated.
+3. `orders` -> srv for Order creation/editing.
+4. `expiration` -> srv watches for orders to be created, cancels them after 15 minutes.
+5. `payments` -> Handle credit cards payments. Cancels orders if payment fails, completes if payments succeeds   
+
+
+### EVENTS IN APP(Ticketing)
+
+User 	-> UserCreated, 
+Order 	-> OrderCreated, OrderCancelled, OrderExpired 
+Ticket	-> TicketUpdated, TickedCreated
+Charge 	-> ChargeCreated
+
