@@ -234,7 +234,7 @@ kind: Deployment
 metadata:
   name: event-bus-depl
 spec:
-  replicas: 1
+  replicas: 20
   selector:
     matchLabels:
       app: event-bus #linking with pod
@@ -266,6 +266,7 @@ spec:
 
 
 ## Ingress Nginx Configurations
+To setup ingress-nginx to to (Kubernetes Ingress Nginx)[https://kubernetes.github.io/ingress-nginx/]
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -283,6 +284,10 @@ spec:
           - path: /api/users/?(.*)
             backend:
               serviceName: auth-srv
+              servicePort: 3000
+			path: /?(.*)
+            backend:
+              serviceName: ui-srv
               servicePort: 3000
 ```
 

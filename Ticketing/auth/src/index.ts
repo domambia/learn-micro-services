@@ -6,6 +6,7 @@ import {
   signOutRouter,
   signUpRouter,
 } from './routes';
+import { errorHandler } from './middlewares/error-handler';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(signInRouter);
 app.use(signOutRouter);
 app.use(signUpRouter);
 app.use(currentUserRouter);
+
+app.use(errorHandler);
 
 // RUNNING APP
 const PORT = process.env.PORT || 3000;
