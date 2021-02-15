@@ -285,10 +285,6 @@ spec:
             backend:
               serviceName: auth-srv
               servicePort: 3000
-			path: /?(.*)
-            backend:
-              serviceName: ui-srv
-              servicePort: 3000
 ```
 
 
