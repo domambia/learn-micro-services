@@ -1,7 +1,7 @@
 /** @format */
 
 import { Schema, model, Document, Model } from 'mongoose';
-import { Password } from './../services/password';
+import { PasswordManager } from '../utils/password-manager';
 // An interface that describes properties that a model needs
 
 interface Attrs {
@@ -21,18 +21,32 @@ interface UserDoc extends Document {
   password: string;
   created_at?: Date;
 }
-
-const userSchema = new Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  created_at: { type: Date, default: Date.now() },
-});
+// Schema
+const userSchema = new Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    created_at: { type: Date, default: Date.now() },
+  },
+  {
+    toJSON: {
+      virtuals: true,
+      // getters, virtuals, minimize,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        delete ret.password;
+      },
+    },
+  }
+);
 
 // MIDDLEWARE
 // pre-save
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
-    const hashedPassword = await Password.toHash(this.get('password'));
+    const hashedPassword = await PasswordManager.toHash(this.get('password'));
     this.set('password', hashedPassword);
   }
   next();

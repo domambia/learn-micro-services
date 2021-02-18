@@ -9,10 +9,18 @@ build:
     push: true
   artifacts:
     - image: domambia/tickening-auth
-      context: auth # folder contain all this files
+      context: auth # folder contain all this files senafaith.azurecr.io
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
           - src: "src/**/*.ts" #find all files ending with .ts
+            dest: .
+    - image: domambia/tickening-client
+      context: client # folder contain all this files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.js" #find all files ending with .ts
             dest: .

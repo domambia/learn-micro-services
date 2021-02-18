@@ -1,35 +1,12 @@
 /** @format */
-import express, { json, Request, Response } from 'express';
+
 import mongoose from 'mongoose';
-import 'express-async-errors';
-import {
-  currentUserRouter,
-  signInRouter,
-  signOutRouter,
-  signUpRouter,
-} from './routes';
-import { errorHandler } from './middlewares/error-handler';
-import { NotFoundError } from './errors';
-
-const app = express();
-
-// MIDDLEWARE
-app.use(json());
-
-// ROUTES
-
-app.use(signInRouter);
-app.use(signOutRouter);
-app.use(signUpRouter);
-app.use(currentUserRouter);
-
-// Not FOUND ERROR Routes
-app.all('*', () => {
-  throw new NotFoundError();
-});
-app.use(errorHandler);
+import { app } from './app';
 
 const start = async () => {
+  if (!process.env.JWT_KEY) {
+    throw new Error('JWT_KEY not defined');
+  }
   try {
     await mongoose.connect('mongodb://auth-mongo-srv:27017/auth', {
       useNewUrlParser: true,
